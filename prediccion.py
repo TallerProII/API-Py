@@ -22,8 +22,8 @@ def funcion(cod_base64: str):
     image_np = np.array(image)
     # endregion
 
-    # model_dict = pickle.load(open('./model.p', 'rb'))
-    # model = model_dict['model']
+    model_dict = pickle.load(open('./model2.p', 'rb'))
+    model = model_dict['model']
 
     labels_dict = {0: 'A', 1: 'B', 2: 'C', 3: 'D', 4: 'E', 5: 'F', 6: 'G', 7: 'H', 8: 'I',
                    9: 'K', 10: 'L', 11: 'M', 12: 'N', 13: 'O', 14: 'P', 15: 'Q', 16: 'R', 17: 'S',
@@ -38,12 +38,7 @@ def funcion(cod_base64: str):
     data = []
     labels = []
     processed_images = 0
-
     data_aux = []
-    x_ = []
-    y_ = []
-    z_ = []
-
     img_rgb = cv2.cvtColor(image_np, cv2.COLOR_BGR2RGB)
 
     # Obtener las dimensiones de la imagen
@@ -52,55 +47,27 @@ def funcion(cod_base64: str):
     results = hands.process(img_rgb)
     if results.multi_hand_landmarks:
         for idx, hand_landmarks in enumerate(results.multi_hand_landmarks):
-            mp_drawing.draw_landmarks(
-                img_rgb,  # image to draw
-                hand_landmarks,  # model output
-                mp_hands.HAND_CONNECTIONS,  # hand connections
-                mp_drawing_styles.get_default_hand_landmarks_style(),
-                mp_drawing_styles.get_default_hand_connections_style())
 
-            data_aux = []
-            x_ = []
-            y_ = []
-            z_ = []
-
+            #region AJUSTAR COORDEDNDAS TOMANDO DE REFERENCIA EL PUNTO 9
+            pos9_x = hand_landmarks.landmark[9].x
+            pos9_y = hand_landmarks.landmark[9].y
             for i in range(len(hand_landmarks.landmark)):
-                x = hand_landmarks.landmark[i].x
-                y = hand_landmarks.landmark[i].y
-                z = hand_landmarks.landmark[i].z
+                # for i in range(len(hand_landmarks.landmark)):
+                pos_x = hand_landmarks.landmark[i].x
+                pos_y = hand_landmarks.landmark[i].y
+                x1_ = (pos_x - (pos9_x - 0.5))  # 0.5 = (m_ancho/ancho_)
+                y1_ = (pos_y - (pos9_y - 0.5))
+                data_aux.append(x1_)
+                data_aux.append(y1_)
+            #endregion
 
-                x_.append(x)
-                y_.append(y)
-                z_.append(z)
-
-            for i in range(len(hand_landmarks.landmark)):
-                x = hand_landmarks.landmark[i].x
-                y = hand_landmarks.landmark[i].y
-                z = hand_landmarks.landmark[i].z
-                data_aux.append(x - min(x_))
-                data_aux.append(y - min(y_))
-                data_aux.append(z - min(z_))
-
-            x1 = int(min(x_) * W) - 10
-            y1 = int(min(y_) * H) - 10
-
-            x2 = int(max(x_) * W) - 10
-            y2 = int(max(y_) * H) - 10
-
-            # region PREDICCION DE LA IMAGEN
-            # prediction = model.predict([np.asarray(data_aux)])
-            # predicted_character = labels_dict[int(prediction[0])]
-            # confidence = model.predict_proba([np.asarray(data_aux)])[0].max() * 100
+            # region PREDICCON DE LA IMAGEN
+            prediction = model.predict([np.asarray(data_aux)])
+            predicted_character = labels_dict[int(prediction[0])]
+            confidence = model.predict_proba([np.asarray(data_aux)])[0].max() * 100
 
             # img_path_full = os.path.join(DATA_DIR, dir_, img_path)
-            # text = f'{img_path_full}\t{predicted_character} ({confidence:.2f}%)'
-
-            # true_label = labels_dict[processed_images]
-            # if true_label != predicted_character:
-            #     print(Fore.RED + text, end='')
-            #     print(Style.RESET_ALL)  # Para restablecer el color a su valor predeterminado
-            # else:
-            #     print(text)
+            text = f'{predicted_character} ({confidence:.2f}%)'
             # endregion
 
     #region MOSTRAR IMAGEN
@@ -109,4 +76,4 @@ def funcion(cod_base64: str):
     # cv2.destroyAllWindows()
     #endregion
 
-    return "todo salio bien"
+    return text
