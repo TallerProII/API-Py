@@ -65,9 +65,3 @@ jobs:
           app-name: 'apifastia'
           slot-name: 'Production'
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_8AA816B8F1F84FE480C2F20A9B0DFC8B }}
-
-      - name: Start FastAPI Server
-          run: |
-            cd $GITHUB_WORKSPACE  # Cambiar al directorio de trabajo
-            source venv/bin/activate  # Activar el entorno virtual
-            uvicorn main:app --host 0.0.0.0 --port 8000 # Iniciar FastAPI en segundo plano
