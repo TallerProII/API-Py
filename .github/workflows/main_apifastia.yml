@@ -68,6 +68,5 @@ jobs:
 
       - name: Start FastAPI Server
           run: |
-            cd $GITHUB_WORKSPACE  # Cambiar al directorio de trabajo
             source venv/bin/activate  # Activar el entorno virtual
             uvicorn main:app --host 0.0.0.0 --port 8000 &  # Iniciar FastAPI en segundo plano
