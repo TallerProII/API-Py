@@ -6,7 +6,6 @@ app = FastAPI()
 #http://127.0.0.0:8000
 
 class Imagen(BaseModel):
-        img_name:str
         cod_base64: str
 
 @app.get("/")
