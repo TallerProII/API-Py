@@ -7,7 +7,7 @@ from PIL import Image
 from io import BytesIO
 
 def funcion(cod_base64: str):
-    mensaje = "Todo va bien"
+    mensaje = " "
     text = " "
     try:
         # region IMAGEN BASE 64 - A MATRIZ NUMPY
@@ -24,7 +24,7 @@ def funcion(cod_base64: str):
         image_np = np.array(image)
         # endregion
 
-        model_dict = pickle.load(open('./model3.p', 'rb'))
+        model_dict = pickle.load(open('./model5.p', 'rb'))
         model = model_dict['model']
 
         labels_dict = {0: 'A', 1: 'B', 2: 'C', 3: 'D', 4: 'E', 5: 'F', 6: 'G', 7: 'H', 8: 'I',
@@ -129,15 +129,16 @@ def funcion(cod_base64: str):
                     data_aux.append(y_)
                 # endregion
                 # endregion
-
+                data_aux=data_aux[:42]
                 # region PREDICCON DE LA IMAGEN
                 prediction = model.predict([np.asarray(data_aux)])
                 predicted_character = labels_dict[int(prediction[0])]
-                confidence = model.predict_proba([np.asarray(data_aux)])[0].max() * 100
+                confidence = round(model.predict_proba([np.asarray(data_aux)])[0].max() * 100,2)
 
                 # img_path_full = os.path.join(DATA_DIR, dir_, img_path)
                 # text = f'{predicted_character} ({confidence:.2f}%)'
                 text = f'{predicted_character}'
+                mensaje = f'{confidence}'
         else:
             mensaje = "No se detecto ninguna mano"
                 # endregion
